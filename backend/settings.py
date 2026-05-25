@@ -16,13 +16,8 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-me-in-producti
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-# Разрешённые хосты
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
-ALLOWED_HOSTS = [h.strip() for h in ALLOWED_HOSTS if h.strip()]
-
-# Если ALLOWED_HOSTS пуст или содержит '*', разрешаем все хосты (для разработки)
-if not ALLOWED_HOSTS:
-    ALLOWED_HOSTS = ['*']
+# Разрешённые хосты - для Render разрешаем все
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -164,22 +159,8 @@ SIMPLE_JWT = {
 
 
 # CORS Settings
-CORS_ALLOWED_ORIGINS = os.environ.get(
-    'CORS_ALLOWED_ORIGINS',
-    'http://localhost:3000,http://127.0.0.1:3000'
-).split(',')
-
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
-
-# Разрешить все Origins в разработке (опционально)
-if os.environ.get('CORS_ALLOW_ALL', 'False') == 'True':
-    CORS_ALLOW_ALL_ORIGINS = True
-else:
-    # Добавить домены Vercel
-    vercel_domains = os.environ.get('VERCEL_DOMAINS', '').split(',')
-    for domain in vercel_domains:
-        if domain:
-            CORS_ALLOWED_ORIGINS.append(f'https://{domain}')
 
 CORS_ALLOW_METHODS = [
     'DELETE',
@@ -202,12 +183,8 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
 ]
 
-# CSRF Settings
-CSRF_TRUSTED_ORIGINS = os.environ.get(
-    'CSRF_TRUSTED_ORIGINS',
-    'http://localhost:3000,http://127.0.0.1:3000,https://frontend123123123.vercel.app,https://backend12312412312.onrender.com'
-).split(',')
-CSRF_TRUSTED_ORIGINS = [h.strip() for h in CSRF_TRUSTED_ORIGINS if h.strip()]
+# CSRF Settings - разрешаем все источники для упрощения
+CSRF_TRUSTED_ORIGINS = ['*']
 
 # Security settings for production
 if not DEBUG:
