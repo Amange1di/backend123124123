@@ -16,15 +16,13 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-me-in-producti
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
+# Разрешённые хосты
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = [h.strip() for h in ALLOWED_HOSTS if h.strip()]
 
-# Для Render и разработки: разрешаем все хосты
-if not ALLOWED_HOSTS or '*' not in ALLOWED_HOSTS:
-    allowed = os.environ.get('ALLOWED_HOSTS', '')
-    if allowed:
-        ALLOWED_HOSTS = [h.strip() for h in allowed.split(',') if h.strip()]
-    else:
-        ALLOWED_HOSTS = ['*']
+# Если ALLOWED_HOSTS пуст или содержит '*', разрешаем все хосты (для разработки)
+if not ALLOWED_HOSTS:
+    ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -207,8 +205,9 @@ CORS_ALLOW_HEADERS = [
 # CSRF Settings
 CSRF_TRUSTED_ORIGINS = os.environ.get(
     'CSRF_TRUSTED_ORIGINS',
-    'http://localhost:3000,http://127.0.0.1:3000,https://frontend123123123.vercel.app'
+    'http://localhost:3000,http://127.0.0.1:3000,https://frontend123123123.vercel.app,https://backend12312412312.onrender.com'
 ).split(',')
+CSRF_TRUSTED_ORIGINS = [h.strip() for h in CSRF_TRUSTED_ORIGINS if h.strip()]
 
 # Security settings for production
 if not DEBUG:
