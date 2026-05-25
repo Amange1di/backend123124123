@@ -18,6 +18,10 @@ DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
+# Allow all hosts in development/Render
+if os.environ.get('ALLOW_ALL_HOSTS') == 'True':
+    ALLOWED_HOSTS = ['*']
+
 
 # Application definition
 INSTALLED_APPS = [
@@ -160,10 +164,20 @@ SIMPLE_JWT = {
 # CORS Settings
 CORS_ALLOWED_ORIGINS = os.environ.get(
     'CORS_ALLOWED_ORIGINS',
-    'http://localhost:3000,http://127.0.0.1:3000,https://frontend123123123.vercel.app'
+    'http://localhost:3000,http://127.0.0.1:3000'
 ).split(',')
 
 CORS_ALLOW_CREDENTIALS = True
+
+# Разрешить все Origins в разработке (опционально)
+if os.environ.get('CORS_ALLOW_ALL', 'False') == 'True':
+    CORS_ALLOW_ALL_ORIGINS = True
+else:
+    # Добавить домены Vercel
+    vercel_domains = os.environ.get('VERCEL_DOMAINS', '').split(',')
+    for domain in vercel_domains:
+        if domain:
+            CORS_ALLOWED_ORIGINS.append(f'https://{domain}')
 
 CORS_ALLOW_METHODS = [
     'DELETE',
