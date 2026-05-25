@@ -18,9 +18,13 @@ DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
-# Allow all hosts in development/Render
-if os.environ.get('ALLOW_ALL_HOSTS') == 'True':
-    ALLOWED_HOSTS = ['*']
+# Для Render и разработки: разрешаем все хосты
+if not ALLOWED_HOSTS or '*' not in ALLOWED_HOSTS:
+    allowed = os.environ.get('ALLOWED_HOSTS', '')
+    if allowed:
+        ALLOWED_HOSTS = [h.strip() for h in allowed.split(',') if h.strip()]
+    else:
+        ALLOWED_HOSTS = ['*']
 
 
 # Application definition
