@@ -3,9 +3,18 @@ set -e
 
 echo "=== Starting Django Application ==="
 
+# Проверяем переменные окружения
+echo "DATABASE_URL set: $([ -n "$DATABASE_URL" ] && echo 'yes' || echo 'no')"
+echo "RENDER_POSTGRES set: $([ -n "$RENDER_POSTGRES" ] && echo 'yes' || echo 'no')"
+
 # Применяем миграции (не прерываем если БД не настроена)
 echo "=== Applying migrations ==="
 if [ -n "$DATABASE_URL" ]; then
+    python manage.py migrate --noinput || {
+        echo "ERROR: Migrations failed!"
+        exit 1
+    }
+elif [ -n "$RENDER_POSTGRES" ]; then
     python manage.py migrate --noinput || {
         echo "ERROR: Migrations failed!"
         exit 1
@@ -16,7 +25,7 @@ fi
 
 # Создаём тестовых пользователей (опционально, не прерываем при ошибке)
 echo "=== Creating test users ==="
-if [ -n "$DATABASE_URL" ]; then
+if [ -n "$DATABASE_URL" ] || [ -n "$RENDER_POSTGRES" ]; then
     python manage.py create_test_users || echo "Warning: create_test_users command failed, continuing..."
 fi
 
