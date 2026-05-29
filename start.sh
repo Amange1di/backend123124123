@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -e
 
 echo "=== Starting Django Application ==="
 
@@ -7,18 +6,20 @@ echo "=== Starting Django Application ==="
 echo "DATABASE_URL set: $([ -n "$DATABASE_URL" ] && echo 'yes' || echo 'no')"
 echo "RENDER_POSTGRES set: $([ -n "$RENDER_POSTGRES" ] && echo 'yes' || echo 'no')"
 
-# Применяем миграции (не прерываем если БД не настроена)
+# Применяем миграции
 echo "=== Applying migrations ==="
 if [ -n "$DATABASE_URL" ]; then
-    python manage.py migrate --noinput || {
+    echo "Running migrations with DATABASE_URL..."
+    if ! python manage.py migrate --noinput; then
         echo "ERROR: Migrations failed!"
         exit 1
-    }
+    fi
 elif [ -n "$RENDER_POSTGRES" ]; then
-    python manage.py migrate --noinput || {
+    echo "Running migrations with RENDER_POSTGRES..."
+    if ! python manage.py migrate --noinput; then
         echo "ERROR: Migrations failed!"
         exit 1
-    }
+    fi
 else
     echo "WARNING: DATABASE_URL not set, skipping migrations"
 fi
@@ -26,7 +27,9 @@ fi
 # Создаём тестовых пользователей (опционально, не прерываем при ошибке)
 echo "=== Creating test users ==="
 if [ -n "$DATABASE_URL" ] || [ -n "$RENDER_POSTGRES" ]; then
-    python manage.py create_test_users || echo "Warning: create_test_users command failed, continuing..."
+    if ! python manage.py create_test_users; then
+        echo "Warning: create_test_users command failed, continuing..."
+    fi
 fi
 
 # Запускаем Gunicorn
