@@ -23,5 +23,8 @@ services:
         value: "3.11"
       - key: WEB_CONCURRENCY
         value: "2"
-      - key: DATABASE_URL
-        sync: false
+
+databases:
+  - name: lms-db
+    databaseName: lms_db
+    user: lms_user
