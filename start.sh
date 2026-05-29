@@ -3,16 +3,22 @@ set -e
 
 echo "=== Starting Django Application ==="
 
-# Применяем миграции
+# Применяем миграции (не прерываем если БД не настроена)
 echo "=== Applying migrations ==="
-python manage.py migrate --noinput || {
-    echo "ERROR: Migrations failed!"
-    exit 1
-}
+if [ -n "$DATABASE_URL" ]; then
+    python manage.py migrate --noinput || {
+        echo "ERROR: Migrations failed!"
+        exit 1
+    }
+else
+    echo "WARNING: DATABASE_URL not set, skipping migrations"
+fi
 
 # Создаём тестовых пользователей (опционально, не прерываем при ошибке)
 echo "=== Creating test users ==="
-python manage.py create_test_users || echo "Warning: create_test_users command failed, continuing..."
+if [ -n "$DATABASE_URL" ]; then
+    python manage.py create_test_users || echo "Warning: create_test_users command failed, continuing..."
+fi
 
 # Запускаем Gunicorn
 echo "=== Starting Gunicorn ==="

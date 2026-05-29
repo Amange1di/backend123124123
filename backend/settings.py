@@ -81,7 +81,11 @@ DATABASES = {
 }
 
 # PostgreSQL for production (Render)
-if os.environ.get('DATABASE_URL'):
+# Проверяем и DATABASE_URL, и RENDER_POSTGRES (который может быть установлен автоматически)
+DATABASE_URL = os.environ.get('DATABASE_URL')
+RENDER_POSTGRES = os.environ.get('RENDER_POSTGRES')
+
+if DATABASE_URL:
     try:
         import dj_database_url
         DATABASES['default'] = dj_database_url.config(
@@ -90,6 +94,16 @@ if os.environ.get('DATABASE_URL'):
         )
     except ImportError:
         pass
+elif RENDER_POSTGRES:
+    # Render автоматически устанавливает RENDER_POSTGRES, но нужны дополнительные переменные
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('RENDER_POSTGRES_DB', 'lms_db'),
+        'USER': os.environ.get('RENDER_POSTGRES_USER', 'lms_user'),
+        'PASSWORD': os.environ.get('RENDER_POSTGRES_PASSWORD', ''),
+        'HOST': os.environ.get('RENDER_POSTGRES_HOST', 'localhost'),
+        'PORT': os.environ.get('RENDER_POSTGRES_PORT', '5432'),
+    }
 
 
 # Password validation
