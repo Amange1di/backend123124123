@@ -11,13 +11,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-me-in-production-for-backend1231241231')
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY", "django-insecure-change-me-in-production-for-backend1231241231"
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+DEBUG = os.environ.get("DEBUG", "False") == "True"
 
 # Разрешённые хосты - для Render разрешаем все
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -82,31 +84,34 @@ DATABASES = {
 
 # PostgreSQL for production (Render)
 # Проверяем и DATABASE_URL, и RENDER_POSTGRES (который может быть установлен автоматически)
-DATABASE_URL = os.environ.get('DATABASE_URL')
-RENDER_POSTGRES = os.environ.get('RENDER_POSTGRES')
+DATABASE_URL = os.environ.get("DATABASE_URL")
+RENDER_POSTGRES = os.environ.get("RENDER_POSTGRES")
 
 if DATABASE_URL:
     try:
         import dj_database_url
-        # Явно передаём DATABASE_URL в функцию
-        DATABASES['default'] = dj_database_url.config(
+
+        # Используем parse_db_url вместо config для явной передачи URL
+        DATABASES["default"] = dj_database_url.parse(
+            DATABASE_URL,
             conn_max_age=600,
             conn_health_checks=True,
-            default=DATABASE_URL
         )
         print(f"DEBUG: PostgreSQL configured from DATABASE_URL")
+        print(f"DEBUG: DATABASE engine: {DATABASES['default']['ENGINE']}")
+        print(f"DEBUG: DATABASE NAME: {DATABASES['default'].get('NAME', 'N/A')}")
     except Exception as e:
         print(f"DEBUG: Failed to configure PostgreSQL: {e}")
         pass
 elif RENDER_POSTGRES:
     # Render автоматически устанавливает RENDER_POSTGRES, но нужны дополнительные переменные
-    DATABASES['default'] = {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('RENDER_POSTGRES_DB', 'lms_db'),
-        'USER': os.environ.get('RENDER_POSTGRES_USER', 'lms_user'),
-        'PASSWORD': os.environ.get('RENDER_POSTGRES_PASSWORD', ''),
-        'HOST': os.environ.get('RENDER_POSTGRES_HOST', 'localhost'),
-        'PORT': os.environ.get('RENDER_POSTGRES_PORT', '5432'),
+    DATABASES["default"] = {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ.get("RENDER_POSTGRES_DB", "lms_db"),
+        "USER": os.environ.get("RENDER_POSTGRES_USER", "lms_user"),
+        "PASSWORD": os.environ.get("RENDER_POSTGRES_PASSWORD", ""),
+        "HOST": os.environ.get("RENDER_POSTGRES_HOST", "localhost"),
+        "PORT": os.environ.get("RENDER_POSTGRES_PORT", "5432"),
     }
     print(f"DEBUG: PostgreSQL configured from RENDER_POSTGRES")
 else:
@@ -166,25 +171,25 @@ AUTH_USER_MODEL = "accounts.User"
 
 # REST Framework settings
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.AllowAny",
     ],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 20,
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 20,
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 
 # JWT Settings
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-    'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': True,
-    'AUTH_HEADER_TYPES': ('Bearer',),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
 
@@ -193,32 +198,32 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_METHODS = [
-    'DELETE',
-    'GET',
-    'OPTIONS',
-    'PATCH',
-    'POST',
-    'PUT',
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
 ]
 
 CORS_ALLOW_HEADERS = [
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'dnt',
-    'origin',
-    'user-agent',
-    'x-csrftoken',
-    'x-requested-with',
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
 ]
 
 # CSRF Settings - разрешаем все источники для упрощения
 CSRF_TRUSTED_ORIGINS = [
-    'https://backend1231241231.onrender.com',
-    'https://frontend123123123.vercel.app',
-    'http://localhost:3000',
-    'http://localhost:8000',
+    "https://backend1231241231.onrender.com",
+    "https://frontend123123123.vercel.app",
+    "http://localhost:3000",
+    "http://localhost:8000",
 ]
 
 # Security settings for production
@@ -228,15 +233,15 @@ if not DEBUG:
     CSRF_COOKIE_SECURE = False
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
-    X_FRAME_OPTIONS = 'DENY'
+    X_FRAME_OPTIONS = "DENY"
 
 
 # DRF Spectacular (Swagger/OpenAPI) settings
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Backend API',
-    'DESCRIPTION': 'API для системы управления курсами и заданиями',
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': False,
-    'COMPONENT_SPLIT_REQUEST': True,
-    'SCHEMA_PATH_PREFIX': '/api/v1/',
+    "TITLE": "Backend API",
+    "DESCRIPTION": "API для системы управления курсами и заданиями",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "COMPONENT_SPLIT_REQUEST": True,
+    "SCHEMA_PATH_PREFIX": "/api/v1/",
 }
