@@ -1,1 +1,1 @@
-\"Allow all hosts and origins for Render\"  
+Fix render build
