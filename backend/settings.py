@@ -189,7 +189,12 @@ CORS_ALLOW_HEADERS = [
 ]
 
 # CSRF Settings - разрешаем все источники для упрощения
-CSRF_TRUSTED_ORIGINS = ['*']
+CSRF_TRUSTED_ORIGINS = [
+    'https://backend1231241231.onrender.com',
+    'https://frontend123123123.vercel.app',
+    'http://localhost:3000',
+    'http://localhost:8000',
+]
 
 # Security settings for production
 if not DEBUG:
