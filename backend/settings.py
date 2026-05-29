@@ -88,11 +88,15 @@ RENDER_POSTGRES = os.environ.get('RENDER_POSTGRES')
 if DATABASE_URL:
     try:
         import dj_database_url
+        # Явно передаём DATABASE_URL в функцию
         DATABASES['default'] = dj_database_url.config(
             conn_max_age=600,
             conn_health_checks=True,
+            default=DATABASE_URL
         )
-    except ImportError:
+        print(f"DEBUG: PostgreSQL configured from DATABASE_URL")
+    except Exception as e:
+        print(f"DEBUG: Failed to configure PostgreSQL: {e}")
         pass
 elif RENDER_POSTGRES:
     # Render автоматически устанавливает RENDER_POSTGRES, но нужны дополнительные переменные
@@ -104,6 +108,9 @@ elif RENDER_POSTGRES:
         'HOST': os.environ.get('RENDER_POSTGRES_HOST', 'localhost'),
         'PORT': os.environ.get('RENDER_POSTGRES_PORT', '5432'),
     }
+    print(f"DEBUG: PostgreSQL configured from RENDER_POSTGRES")
+else:
+    print(f"DEBUG: Using SQLite database")
 
 
 # Password validation
