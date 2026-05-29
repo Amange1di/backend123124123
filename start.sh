@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
+cd /opt/render/project/src/backend
+
 echo "=== Starting Django Application ==="
 
 # Применяем миграции
@@ -12,8 +14,8 @@ python manage.py migrate --noinput || {
 
 # Создаём тестовых пользователей (опционально, не прерываем при ошибке)
 echo "=== Creating test users ==="
-python create_test_users.py || echo "Warning: create_test_users.py failed, continuing..."
+python manage.py create_test_users || echo "Warning: create_test_users command failed, continuing..."
 
 # Запускаем Gunicorn
 echo "=== Starting Gunicorn ==="
-exec gunicorn backend.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+exec gunicorn backend.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 2 --timeout 120
