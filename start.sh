@@ -3,16 +3,14 @@ set -e
 
 echo "=== Starting Django Application ==="
 
-# Проверяем наличие DATABASE_URL
-if [ -z "$DATABASE_URL" ]; then
-    echo "Warning: DATABASE_URL not set. Using default SQLite."
-fi
-
 # Применяем миграции
 echo "=== Applying migrations ==="
-python manage.py migrate --noinput
+python manage.py migrate --noinput || {
+    echo "ERROR: Migrations failed!"
+    exit 1
+}
 
-# Создаём тестовых пользователей (опционально)
+# Создаём тестовых пользователей (опционально, не прерываем при ошибке)
 echo "=== Creating test users ==="
 python create_test_users.py || echo "Warning: create_test_users.py failed, continuing..."
 
