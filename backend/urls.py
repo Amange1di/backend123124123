@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.http import JsonResponse
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenRefreshView
@@ -15,6 +16,9 @@ from assignments.views import (
     TaskViewSet, SubmissionViewSet, FeedbackViewSet,
     TaskBatchViewSet, SubmissionAnalyticsViewSet
 )
+
+def health_check(request):
+    return JsonResponse({'status': 'ok'})
 
 router = DefaultRouter()
 
@@ -41,6 +45,9 @@ router.register(r'task-batches', TaskBatchViewSet, basename='task-batch')
 router.register(r'submission-analytics', SubmissionAnalyticsViewSet, basename='submission-analytics')
 
 urlpatterns = [
+    # Health check for Render
+    path('', health_check, name='health_check'),
+    
     # JWT Auth
     path('api/auth/login/', CustomTokenObtainPairView.as_view(), name='login'),
     path('api/auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
