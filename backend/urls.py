@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.http import JsonResponse
 from django.urls import path, include
+from django.views.generic import TemplateView
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenRefreshView
 
@@ -47,6 +49,10 @@ router.register(r'submission-analytics', SubmissionAnalyticsViewSet, basename='s
 urlpatterns = [
     # Health check for Render
     path('', health_check, name='health_check'),
+    
+    # API Schema (Swagger/OpenAPI)
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     
     # JWT Auth
     path('api/auth/login/', CustomTokenObtainPairView.as_view(), name='login'),
