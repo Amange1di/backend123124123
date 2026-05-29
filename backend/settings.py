@@ -90,16 +90,33 @@ RENDER_POSTGRES = os.environ.get("RENDER_POSTGRES")
 if DATABASE_URL:
     try:
         import dj_database_url
+        # Пытаемся распарсить URL вручную, если parse не работает
+        try:
+            DATABASES['default'] = dj_database_url.parse(
+                DATABASE_URL,
+                conn_max_age=600,
+                conn_health_checks=True,
+            )
+        except Exception as parse_error:
+            print(f"DEBUG: dj_database_url.parse() failed: {parse_error}")
+            # Ручной парсинг DATABASE_URL
+            from urllib.parse import urlparse
+            parsed = urlparse(DATABASE_URL)
+            DATABASES['default'] = {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': parsed.path.lstrip('/'),
+                'USER': parsed.username,
+                'PASSWORD': parsed.password,
+                'HOST': parsed.hostname,
+                'PORT': parsed.port or 5432,
+                'CONN_MAX_AGE': 600,
+            }
+            print(f"DEBUG: Manual parse - NAME: {DATABASES['default']['NAME']}")
 
-        # Используем parse_db_url вместо config для явной передачи URL
-        DATABASES["default"] = dj_database_url.parse(
-            DATABASE_URL,
-            conn_max_age=600,
-            conn_health_checks=True,
-        )
         print(f"DEBUG: PostgreSQL configured from DATABASE_URL")
         print(f"DEBUG: DATABASE engine: {DATABASES['default']['ENGINE']}")
         print(f"DEBUG: DATABASE NAME: {DATABASES['default'].get('NAME', 'N/A')}")
+        print(f"DEBUG: DATABASE HOST: {DATABASES['default'].get('HOST', 'N/A')}")
     except Exception as e:
         print(f"DEBUG: Failed to configure PostgreSQL: {e}")
         pass
