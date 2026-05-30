@@ -5,13 +5,17 @@ Django settings for backend project.
 import os
 from pathlib import Path
 from datetime import timedelta
-from dotenv import load_dotenv
-
-# Load environment variables from .env file
-load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load .env only if DATABASE_URL is not set (local development)
+if not os.environ.get("DATABASE_URL"):
+    try:
+        from dotenv import load_dotenv
+        load_dotenv()
+    except ImportError:
+        pass
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -79,31 +83,38 @@ WSGI_APPLICATION = "backend.wsgi.application"
 
 
 # Database - PostgreSQL for Render, SQLite for local
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
-
-# PostgreSQL для production (Render)
 DATABASE_URL = os.environ.get("DATABASE_URL")
+USE_SQLITE = os.environ.get("USE_SQLITE", "false").lower() == "true"
 
-if DATABASE_URL:
+# Если явно указан USE_SQLITE=true или нет DATABASE_URL — используем SQLite
+if USE_SQLITE or not DATABASE_URL:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
+    print("INFO: Using SQLite database")
+else:
+    # PostgreSQL из DATABASE_URL
     try:
         import dj_database_url
-        DATABASES['default'] = dj_database_url.config(
-            conn_max_age=600,
-            conn_health_checks=True,
-        )
-        print(f"DEBUG: PostgreSQL configured from DATABASE_URL")
-    except ImportError:
-        print("ERROR: dj_database_url not installed. Run: pip install dj-database-url")
+        DATABASES = {
+            "default": dj_database_url.config(
+                conn_max_age=600,
+                conn_health_checks=True,
+            )
+        }
+        print("INFO: Using PostgreSQL database")
     except Exception as e:
         print(f"ERROR: Failed to configure PostgreSQL: {e}")
-        print(f"DEBUG: Using SQLite as fallback")
-else:
-    print(f"DEBUG: Using SQLite database")
+        print("INFO: Falling back to SQLite")
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.sqlite3",
+                "NAME": BASE_DIR / "db.sqlite3",
+            }
+        }
 
 
 # Password validation
