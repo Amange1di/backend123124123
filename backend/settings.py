@@ -1,4 +1,4 @@
-"""
+п»ї"""
 Django settings for backend project.
 """
 
@@ -6,10 +6,8 @@ import os
 from pathlib import Path
 from datetime import timedelta
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Load .env only for local development
 if not os.environ.get("USE_SQLITE"):
     try:
         from dotenv import load_dotenv
@@ -17,20 +15,13 @@ if not os.environ.get("USE_SQLITE"):
     except ImportError:
         pass
 
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get(
     "SECRET_KEY", "django-insecure-change-me-in-production-for-backend1231241231"
 )
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", "False") == "True"
-
-# РАЗРЕШЁННЫЕ хосты - читаем из окружения или используем дефолтные
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
 
-
-# Application definition
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -38,12 +29,10 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # Third party apps
     "rest_framework",
     "rest_framework_simplejwt",
     "corsheaders",
     "drf_spectacular",
-    # Local apps
     "accounts",
     "courses",
     "assignments",
@@ -81,18 +70,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "backend.wsgi.application"
 
-
-# Database - always SQLite
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
-print("INFO: Using SQLite database")
 
-
-# Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -108,44 +92,28 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Internationalization
 LANGUAGE_CODE = "ru-ru"
-
 TIME_ZONE = "Asia/Almaty"
-
 USE_I18N = True
-
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# STATICFILES_DIRS только если папка существует (для локальной разработки)
 STATIC_DIR = BASE_DIR / "static"
 if STATIC_DIR.exists():
     STATICFILES_DIRS = [STATIC_DIR]
 else:
     STATICFILES_DIRS = []
 
-# WhiteNoise for static files
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-# Media files
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-# Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-
-# Custom User Model
 AUTH_USER_MODEL = "accounts.User"
 
-
-# REST Framework settings
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
@@ -158,8 +126,6 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
-
-# JWT Settings
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
@@ -168,23 +134,14 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
-
-# CORS Settings
 CORS_ALLOW_ALL_ORIGINS = os.environ.get("CORS_ALLOW_ALL_ORIGINS", "True").lower() == "true"
 CORS_ALLOWED_ORIGINS = os.environ.get(
     "CORS_ALLOWED_ORIGINS",
-    "http://localhost:3000,http://localhost:8000"
+    "http://localhost:3000,http://localhost:8000",
 ).split(",")
 CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLOW_METHODS = [
-    "DELETE",
-    "GET",
-    "OPTIONS",
-    "PATCH",
-    "POST",
-    "PUT",
-]
+CORS_ALLOW_METHODS = ["DELETE", "GET", "OPTIONS", "PATCH", "POST", "PUT"]
 
 CORS_ALLOW_HEADERS = [
     "accept",
@@ -198,13 +155,11 @@ CORS_ALLOW_HEADERS = [
     "x-requested-with",
 ]
 
-# CSRF Settings - разрешаем все источники для упрощения
 CSRF_TRUSTED_ORIGINS = os.environ.get(
-    "CSRF_TRUSTED_ORIGINS", 
-    "https://backend1231241231.onrender.com,https://frontend123123123.vercel.app,http://localhost:3000,http://localhost:8000"
+    "CSRF_TRUSTED_ORIGINS",
+    "https://backend1231241231.onrender.com,https://frontend123123123.vercel.app,http://localhost:3000,http://localhost:8000",
 ).split(",")
 
-# Security settings for production
 if not DEBUG:
     SECURE_SSL_REDIRECT = False
     SESSION_COOKIE_SECURE = False
@@ -213,11 +168,9 @@ if not DEBUG:
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = "DENY"
 
-
-# DRF Spectacular (Swagger/OpenAPI) settings
 SPECTACULAR_SETTINGS = {
     "TITLE": "Backend API",
-    "DESCRIPTION": "API для системы управления курсами и заданиями",
+    "DESCRIPTION": "API for course and assignment management system",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
     "COMPONENT_SPLIT_REQUEST": True,
