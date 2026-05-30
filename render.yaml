@@ -2,8 +2,8 @@ services:
   - type: web
     name: edudata-backend
     env: python
-    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate
-    startCommand: python manage.py runserver 0.0.0.0:$PORT
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
+    startCommand: bash -lc "python manage.py migrate && python -m gunicorn backend.wsgi:application --log-file - --bind 0.0.0.0:$PORT"
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
