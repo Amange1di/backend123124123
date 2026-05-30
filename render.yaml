@@ -13,17 +13,19 @@ services:
         generateValue: true
         sync: false
       - key: ALLOWED_HOSTS
-        value: "localhost,127.0.0.1,.onrender.com"
-        sync: false
-      - key: DATABASE_URL
-        fromService:
-          type: postgres
-          name: edudata-db
-          property: connectionString
+        value: "*.onrender.com"
         sync: false
       - key: CORS_ALLOWED_ORIGINS
         value: "https://frontend123123123.vercel.app,http://localhost:3000"
         sync: false
       - key: CSRF_TRUSTED_ORIGINS
-        value: "https://frontend123123123.vercel.app,http://localhost:3000,https://backend1231241231.onrender.com"
+        value: "https://frontend123123123.vercel.app,http://localhost:3000,https://*.onrender.com"
         sync: false
+    disk:
+      name: edudata-data
+      mountPath: /opt/render/project/src
+
+databases:
+  - name: edudata-db
+    databaseName: edudata
+    user: edudata_user

@@ -87,54 +87,21 @@ DATABASES = {
 }
 
 # PostgreSQL для production (Render)
-# Проверяем и DATABASE_URL, и RENDER_POSTGRES (который может быть установлен автоматически)
 DATABASE_URL = os.environ.get("DATABASE_URL")
-RENDER_POSTGRES = os.environ.get("RENDER_POSTGRES")
 
 if DATABASE_URL:
     try:
         import dj_database_url
-        # Пытаемся распарсить URL вручную, если parse не работает
-        try:
-            DATABASES['default'] = dj_database_url.parse(
-                DATABASE_URL,
-                conn_max_age=600,
-                conn_health_checks=True,
-            )
-            print(f"DEBUG: PostgreSQL configured from DATABASE_URL")
-            print(f"DEBUG: DATABASE engine: {DATABASES['default']['ENGINE']}")
-            print(f"DEBUG: DATABASE NAME: {DATABASES['default'].get('NAME', 'N/A')}")
-            print(f"DEBUG: DATABASE HOST: {DATABASES['default'].get('HOST', 'N/A')}")
-        except Exception as parse_error:
-            print(f"DEBUG: dj_database_url.parse() failed: {parse_error}")
-            # Ручной парсинг DATABASE_URL
-            from urllib.parse import urlparse
-            parsed = urlparse(DATABASE_URL)
-            DATABASES['default'] = {
-                'ENGINE': 'django.db.backends.postgresql',
-                'NAME': parsed.path.lstrip('/'),
-                'USER': parsed.username,
-                'PASSWORD': parsed.password,
-                'HOST': parsed.hostname,
-                'PORT': parsed.port or 5432,
-                'CONN_MAX_AGE': 600,
-            }
-            print(f"DEBUG: Manual parse - NAME: {DATABASES['default']['NAME']}")
+        DATABASES['default'] = dj_database_url.config(
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+        print(f"DEBUG: PostgreSQL configured from DATABASE_URL")
     except ImportError:
         print("ERROR: dj_database_url not installed. Run: pip install dj-database-url")
     except Exception as e:
         print(f"ERROR: Failed to configure PostgreSQL: {e}")
-elif RENDER_POSTGRES:
-    # Render автоматически устанавливает RENDER_POSTGRES, но нужны дополнительные переменные
-    DATABASES["default"] = {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("RENDER_POSTGRES_DB", "lms_db"),
-        "USER": os.environ.get("RENDER_POSTGRES_USER", "lms_user"),
-        "PASSWORD": os.environ.get("RENDER_POSTGRES_PASSWORD", ""),
-        "HOST": os.environ.get("RENDER_POSTGRES_HOST", "localhost"),
-        "PORT": os.environ.get("RENDER_POSTGRES_PORT", "5432"),
-    }
-    print(f"DEBUG: PostgreSQL configured from RENDER_POSTGRES")
+        print(f"DEBUG: Using SQLite as fallback")
 else:
     print(f"DEBUG: Using SQLite database")
 
