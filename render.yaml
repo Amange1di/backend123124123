@@ -8,6 +8,12 @@ services:
       pip install -r requirements.txt
       python manage.py collectstatic --noinput
     startCommand: bash start.sh
+    healthCheck:
+      path: /health/
+      initialDelay: 10
+      period: 10
+      timeout: 5
+      unhealthyThreshold: 3
     envVars:
       - key: SECRET_KEY
         generateValue: true
