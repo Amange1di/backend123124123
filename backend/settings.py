@@ -22,8 +22,8 @@ SECRET_KEY = os.environ.get(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-# Разрешённые хосты - для Render разрешаем все
-ALLOWED_HOSTS = ["*"]
+# Разрешённые хосты - читаем из окружения или используем дефолтные
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
 
 
 # Application definition
@@ -217,7 +217,11 @@ SIMPLE_JWT = {
 
 
 # CORS Settings
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = os.environ.get("CORS_ALLOW_ALL_ORIGINS", "True").lower() == "true"
+CORS_ALLOWED_ORIGINS = os.environ.get(
+    "CORS_ALLOWED_ORIGINS",
+    "http://localhost:3000,http://localhost:8000"
+).split(",")
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_METHODS = [
@@ -242,12 +246,10 @@ CORS_ALLOW_HEADERS = [
 ]
 
 # CSRF Settings - разрешаем все источники для упрощения
-CSRF_TRUSTED_ORIGINS = [
-    "https://backend1231241231.onrender.com",
-    "https://frontend123123123.vercel.app",
-    "http://localhost:3000",
-    "http://localhost:8000",
-]
+CSRF_TRUSTED_ORIGINS = os.environ.get(
+    "CSRF_TRUSTED_ORIGINS", 
+    "https://backend1231241231.onrender.com,https://frontend123123123.vercel.app,http://localhost:3000,http://localhost:8000"
+).split(",")
 
 # Security settings for production
 if not DEBUG:
