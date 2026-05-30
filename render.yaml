@@ -2,6 +2,7 @@ services:
   - type: web
     name: edudata-backend
     env: python
+    rootDir: backend
     buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
     startCommand: bash -lc "python manage.py migrate && python -m gunicorn backend.wsgi:application --log-file - --bind 0.0.0.0:$PORT"
     envVars:
@@ -14,14 +15,16 @@ services:
         generateValue: true
         sync: false
       - key: ALLOWED_HOSTS
-        value: "*.onrender.com"
+        value: "localhost,127.0.0.1,.onrender.com"
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: edudata-db
+          property: connectionString
         sync: false
       - key: CORS_ALLOWED_ORIGINS
-        value: "https://frontend123123123.vercel.app,http://localhost:3000"
         sync: false
-      - key: CSRF_TRUSTED_ORIGINS
-        value: "https://frontend123123123.vercel.app,http://localhost:3000,https://*.onrender.com"
-        sync: false
-    disk:
-      name: edudata-data
-      mountPath: /opt/render/project/src
+        fromService:
+          type: frontend
+          property: url
+          prefix: https://
