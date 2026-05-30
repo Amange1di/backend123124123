@@ -6,6 +6,7 @@ echo "=== Starting Django Application ==="
 echo "DATABASE_URL set: $([ -n "$DATABASE_URL" ] && echo 'yes' || echo 'no')"
 echo "DATABASE_URL length: ${#DATABASE_URL}"
 echo "RENDER_POSTGRES set: $([ -n "$RENDER_POSTGRES" ] && echo 'yes' || echo 'no')"
+echo "PORT: ${PORT:-8000}"
 
 # Применяем миграции
 echo "=== Applying migrations ==="
@@ -16,6 +17,7 @@ if [ -n "$DATABASE_URL" ]; then
         echo "ERROR: Migrations failed!"
         exit 1
     fi
+    echo "Migrations completed successfully"
 elif [ -n "$RENDER_POSTGRES" ]; then
     echo "Running migrations with RENDER_POSTGRES..."
     if ! python manage.py migrate --noinput --verbosity=2; then
@@ -24,10 +26,10 @@ elif [ -n "$RENDER_POSTGRES" ]; then
     fi
 else
     echo "WARNING: DATABASE_URL not set, using SQLite (NOT recommended for production)"
-    python manage.py migrate --noinput || {
+    if ! python manage.py migrate --noinput; then
         echo "ERROR: Migrations failed!"
         exit 1
-    }
+    fi
 fi
 
 # Создаём тестовых пользователей (опционально, не прерываем при ошибке)

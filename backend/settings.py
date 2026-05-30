@@ -82,7 +82,7 @@ DATABASES = {
     }
 }
 
-# PostgreSQL for production (Render)
+# PostgreSQL для production (Render)
 # Проверяем и DATABASE_URL, и RENDER_POSTGRES (который может быть установлен автоматически)
 DATABASE_URL = os.environ.get("DATABASE_URL")
 RENDER_POSTGRES = os.environ.get("RENDER_POSTGRES")
@@ -97,6 +97,10 @@ if DATABASE_URL:
                 conn_max_age=600,
                 conn_health_checks=True,
             )
+            print(f"DEBUG: PostgreSQL configured from DATABASE_URL")
+            print(f"DEBUG: DATABASE engine: {DATABASES['default']['ENGINE']}")
+            print(f"DEBUG: DATABASE NAME: {DATABASES['default'].get('NAME', 'N/A')}")
+            print(f"DEBUG: DATABASE HOST: {DATABASES['default'].get('HOST', 'N/A')}")
         except Exception as parse_error:
             print(f"DEBUG: dj_database_url.parse() failed: {parse_error}")
             # Ручной парсинг DATABASE_URL
@@ -112,14 +116,10 @@ if DATABASE_URL:
                 'CONN_MAX_AGE': 600,
             }
             print(f"DEBUG: Manual parse - NAME: {DATABASES['default']['NAME']}")
-
-        print(f"DEBUG: PostgreSQL configured from DATABASE_URL")
-        print(f"DEBUG: DATABASE engine: {DATABASES['default']['ENGINE']}")
-        print(f"DEBUG: DATABASE NAME: {DATABASES['default'].get('NAME', 'N/A')}")
-        print(f"DEBUG: DATABASE HOST: {DATABASES['default'].get('HOST', 'N/A')}")
+    except ImportError:
+        print("ERROR: dj_database_url not installed. Run: pip install dj-database-url")
     except Exception as e:
-        print(f"DEBUG: Failed to configure PostgreSQL: {e}")
-        pass
+        print(f"ERROR: Failed to configure PostgreSQL: {e}")
 elif RENDER_POSTGRES:
     # Render автоматически устанавливает RENDER_POSTGRES, но нужны дополнительные переменные
     DATABASES["default"] = {
@@ -170,6 +170,8 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 STATIC_DIR = BASE_DIR / "static"
 if STATIC_DIR.exists():
     STATICFILES_DIRS = [STATIC_DIR]
+else:
+    STATICFILES_DIRS = []
 
 # WhiteNoise for static files
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
