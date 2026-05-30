@@ -1,40 +1,30 @@
 services:
   - type: web
-    name: lms-backend
+    name: edudata-backend
     env: python
-    branch: main
-    buildCommand: |
-      pip install --upgrade pip
-      pip install -r requirements.txt
-      python manage.py collectstatic --noinput
-    startCommand: bash start.sh
-    healthCheck:
-      path: /health/
-      initialDelay: 10
-      period: 10
-      timeout: 5
-      unhealthyThreshold: 3
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate
+    startCommand: gunicorn backend.wsgi:application --log-file - --bind 0.0.0.0:$PORT
     envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: DEBUG
+        value: false
+        sync: false
       - key: SECRET_KEY
         generateValue: true
-      - key: DEBUG
-        value: "false"
-      - key: DJANGO_SETTINGS_MODULE
-        value: "backend.settings"
+        sync: false
       - key: ALLOWED_HOSTS
-        value: "*"
-      - key: CORS_ALLOW_ALL_ORIGINS
-        value: "true"
-      - key: PYTHON_VERSION
-        value: "3.11"
-      - key: WEB_CONCURRENCY
-        value: "2"
+        value: "localhost,127.0.0.1,.onrender.com"
+        sync: false
       - key: DATABASE_URL
-        fromDatabase:
-          name: lms-db
+        fromService:
+          type: postgres
+          name: edudata-db
           property: connectionString
-
-databases:
-  - name: lms-db
-    databaseName: lms_db
-    user: lms_user
+        sync: false
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+        fromService:
+          type: frontend
+          property: url
+          prefix: https://
