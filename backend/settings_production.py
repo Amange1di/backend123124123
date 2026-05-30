@@ -28,14 +28,6 @@ DATABASES = {
     }
 }
 
-# Для PostgreSQL (опционально)
-if os.environ.get('DATABASE_URL'):
-    import dj_database_url
-    DATABASES['default'] = dj_database_url.config(
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
-
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
