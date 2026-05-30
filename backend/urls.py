@@ -47,8 +47,9 @@ router.register(r'task-batches', TaskBatchViewSet, basename='task-batch')
 router.register(r'submission-analytics', SubmissionAnalyticsViewSet, basename='submission-analytics')
 
 urlpatterns = [
-    # Health check for Render
-    path('', health_check, name='health_check'),
+    # Health check for Render (explicit path)
+    path('health/', health_check, name='health_check'),
+    path('', health_check, name='health_root'),
     
     # API Schema (Swagger/OpenAPI)
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
